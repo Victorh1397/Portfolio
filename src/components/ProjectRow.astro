@@ -1,7 +1,7 @@
 ---
 import { useTranslations, type Lang } from '@/i18n/ui';
 import { routes } from '@/i18n/routes';
-import { pad, type Project } from '@/lib/projects';
+import type { Project } from '@/lib/projects';
 
 interface Props {
   project: Project;
@@ -15,7 +15,7 @@ const { title, summary, areas, year } = project.data;
 ---
 
 <li class="row" data-areas={areas.join(' ')}>
-  <span class="num mono" aria-hidden="true">{pad(index + 1)}</span>
+  <span class="num mono" aria-hidden="true">{index + 1}</span>
   <div class="main">
     <h3 class="title" style={`view-transition-name: project-${project.slug}`}>
       <a href={routes.project(lang, project.slug)}>{title}</a>

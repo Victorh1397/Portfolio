@@ -12,7 +12,7 @@ donde se cuenta cada caso de estudio.
 ## Requisitos
 
 - **R1.** La home DEBE abrir con una presentación de 2 o 3 líneas: nombre, foco profesional y el enfoque de trabajo.
-- **R2.** La home DEBE listar los proyectos como un índice numerado (01, 02…), ordenado por `order`, con título, resumen, áreas y año.
+- **R2.** La home DEBE listar los proyectos como un índice numerado (1, 2…), ordenado por `order`, con título, resumen, áreas y año.
 - **R3.** CUANDO el usuario elija un área en el filtro, EL SISTEMA DEBE mostrar solo los proyectos de esa área y anunciar el número de resultados a lectores de pantalla.
 - **R4.** SI JavaScript no está disponible, ENTONCES EL SISTEMA DEBE mostrar todos los proyectos y ocultar el filtro.
 - **R5.** Toda la fila del índice DEBE ser clicable y llevar al detalle.
@@ -55,3 +55,4 @@ donde se cuenta cada caso de estudio.
 - Se quitó el contador "05" junto al título "Proyectos": repetía el estado del filtro ("5 proyectos").
 - El eyebrow del detalle muestra `NN · año`. El contexto completo ya está en la ficha lateral.
 - Chrome headless impone un viewport mínimo de unos 550 px; la prueba a 360 px se hizo dentro de un iframe.
+- La numeración pasó de "01, 02…" a "1, 2…" (2026-11-18): Victor la considera una marca típica de las plantillas generadas por IA. También cambia el eyebrow del detalle ("2 · 2026").

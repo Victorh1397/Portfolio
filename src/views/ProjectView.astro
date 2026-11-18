@@ -6,7 +6,7 @@ import Flow from '@/components/Flow.astro';
 import '@/styles/prose.css';
 import { locales, useTranslations, type Lang } from '@/i18n/ui';
 import { alternates, routes } from '@/i18n/routes';
-import { pad, type Project } from '@/lib/projects';
+import type { Project } from '@/lib/projects';
 import { formatMonth, getRepoMeta, repoUrl } from '@/lib/github';
 import { site } from '@/config/site';
 
@@ -51,7 +51,7 @@ const jsonLd = {
   <article class="container">
     <header class="head">
       <a class="back mono" href={`${routes.home(lang)}#proyectos`}>← {t('project.all')}</a>
-      <p class="eyebrow">{pad(index + 1)} · {data.year}</p>
+      <p class="eyebrow">{index + 1} · {data.year}</p>
       <h1 style={`view-transition-name: project-${project.slug}`}>{data.title}</h1>
       <p class="lead">{data.summary}</p>
     </header>
