@@ -39,7 +39,7 @@ draft ──► approved ──► in-progress ──► done
 | [006 Home and detail](006-home-and-detail/spec.md) | done |
 | [007 About and CV](007-about-cv/spec.md) | in-progress (revisión de la bio) |
 | [008 SEO and analytics](008-seo-analytics/spec.md) | done |
-| [009 Deploy](009-deploy/spec.md) | approved (falta push y Cloudflare) |
+| [009 Deploy](009-deploy/spec.md) | in-progress (falta conectar Cloudflare) |
 | [010 Experience and web CV](010-experience-and-web-cv/spec.md) | done |
 
 ## Cuándo NO hace falta spec

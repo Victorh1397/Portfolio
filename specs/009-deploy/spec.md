@@ -1,6 +1,6 @@
 # 009 — Deploy (Cloudflare Pages)
 
-- **Estado:** approved
+- **Estado:** in-progress
 - **Fecha:** 2026-11-18
 - **Depende de:** 001–008
 
@@ -42,7 +42,7 @@ Pasos (los que requieren cuentas los hace Victor):
 ## Tareas
 
 - [x] T1a Repo `Victorh1397/Portfolio` creado y remoto `origin` configurado (R1)
-- [ ] T1b Push de `main` (R1)
+- [x] T1b Push de `main` (R1)
 - [ ] T2 Victor conecta el repo en Cloudflare Pages con la configuración de arriba (R1, R2, R3)
 - [ ] T3 Ajustar `SITE_URL` al subdominio real (R4)
 - [ ] T4 Activar Web Analytics (spec 008 R5)
