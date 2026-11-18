@@ -1,0 +1,71 @@
+---
+import { useTranslations, type Lang } from '@/i18n/ui';
+import { contactLinks, site } from '@/config/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+const links = contactLinks();
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer container">
+  <div class="row">
+    <p class="mono">© {year} {site.name}</p>
+    {
+      links.length > 0 && (
+        <ul class="mono">
+          {links.map((link) => (
+            <li>
+              <a href={link.href} rel={link.key === 'email' ? undefined : 'me noopener'}>
+                {t(`contact.${link.key}`)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+  <p class="colophon">{t('footer.colophon')}</p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-2xl);
+    padding-block: var(--space-m) var(--space-l);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--rule);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    list-style: none;
+    padding: 0;
+  }
+
+  a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  .colophon {
+    margin-top: var(--space-xs);
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+</style>
