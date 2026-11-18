@@ -16,6 +16,52 @@ metrics:
     label: p50 latency on CPU
   - value: '379'
     label: automated tests
+diagram:
+  caption: One index serves both search and duplicate detection, and an exact oracle measures whether the index drops candidates.
+  lanes:
+    - label: Ingestion
+      steps:
+        - label: Data
+          nodes:
+            - title: 15,000-product catalogue
+              detail: 10 files verified by SHA-256
+        - label: Representation
+          nodes:
+            - title: Text composition
+              detail: 3 strategies compared (E0–E3)
+            - title: e5-base embeddings
+              detail: 768 dims, normalised, cached
+        - label: Store
+          nodes:
+            - title: Qdrant
+              detail: approximate HNSW, what ships
+              accent: true
+            - title: NumPy oracle
+              detail: exact search, the yardstick
+    - label: Query and evaluation
+      steps:
+        - label: Retrieval
+          nodes:
+            - title: Dense search
+              detail: brand filter inside the engine
+            - title: TF-IDF
+              detail: baseline
+        - label: Applications
+          nodes:
+            - title: Duplicates
+              detail: calibrated, frozen threshold
+            - title: Events
+              detail: 24 ordered mutations
+        - label: Evaluation
+          nodes:
+            - title: Metrics
+              detail: nDCG, Recall, MRR
+            - title: Fidelity and attribution
+              detail: engine vs oracle, which layer fails
+        - label: Delivery
+          nodes:
+            - title: Artefacts
+              detail: validated against the contract before writing
 ---
 
 ## Problem

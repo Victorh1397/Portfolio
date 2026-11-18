@@ -18,6 +18,53 @@ metrics:
     label: median turn time in a spoken conversation
   - value: '313'
     label: automated tests
+diagram:
+  caption: A spoken turn makes a single round trip. OCR and the index are prepared beforehand, offline.
+  lanes:
+    - label: On every turn
+      steps:
+        - label: Channels
+          nodes:
+            - title: Voice
+              detail: microphone, ends on silence
+            - title: Telegram
+              detail: messages and buttons
+        - label: Dialogue
+          nodes:
+            - title: Dialogflow ES
+              detail: native STT and TTS, 13 intents
+        - label: Rules
+          nodes:
+            - title: FastAPI webhook
+              detail: ID regex, scheduling, SSML
+              accent: true
+        - label: Retrieval
+          nodes:
+            - title: FAISS
+              detail: passages closest to the question
+        - label: Answer
+          nodes:
+            - title: Gemini
+              detail: documents only, or NO_DISPONIBLE
+    - label: Offline, once
+      offline: true
+      steps:
+        - nodes:
+            - title: Documents D1–D5
+              detail: scanned JPGs, fictional
+        - nodes:
+            - title: Tesseract OCR
+              detail: Spanish, with preprocessing
+        - nodes:
+            - title: Regex
+              detail: price and schedule validation
+        - nodes:
+            - title: Index
+              detail: passages and embeddings, loaded at startup
+figures:
+  - src: ../../../assets/projects/vicky/tarifario.jpg
+    alt: Fictional scanned document "Tarifario de consultas" (consultation fees) from Grupo Médico Visoria, with a table of specialties, doctors and prices in US dollars.
+    caption: One of the five fictional documents the pipeline reads with OCR. Vicky answers only from what they contain.
 ---
 
 ## Problem

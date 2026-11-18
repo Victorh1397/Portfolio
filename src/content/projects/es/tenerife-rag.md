@@ -7,6 +7,45 @@ stack: [OpenAI API, ChromaDB, Streamlit, PyPDF, jsonschema, Python]
 year: 2026
 order: 4
 context: Large Language Models · Máster en IA, Cloud Computing y DevOps (Pontia)
+diagram:
+  caption: La guía se indexa una vez. En cada pregunta, el modelo decide mediante tool calling si buscar en ella.
+  lanes:
+    - label: Ingesta (notebook, una vez)
+      offline: true
+      steps:
+        - nodes:
+            - title: Guía en PDF
+              detail: TENERIFE.pdf, extraída con PyPDF
+        - nodes:
+            - title: Chunking
+              detail: longitud fija, 200 caracteres de solapamiento
+        - nodes:
+            - title: Embeddings
+              detail: text-embedding-3-small
+        - nodes:
+            - title: ChromaDB
+              detail: persistida en disco
+    - label: En cada pregunta (app Streamlit)
+      steps:
+        - label: Entrada
+          nodes:
+            - title: Chat
+              detail: historial de 10 turnos, máx. 1000 caracteres
+        - label: Orquestación
+          nodes:
+            - title: GPT-4.1-mini
+              detail: tool calling, máximo 5 rondas
+              accent: true
+        - label: Herramientas
+          nodes:
+            - title: search_tenerife_info
+              detail: top-k fragmentos de ChromaDB
+            - title: get_weather
+              detail: clima simulado
+        - label: Respuesta
+          nodes:
+            - title: Respuesta con fuente
+              detail: el modelo redacta con el contexto y cita el chunk
 ---
 
 ## Problema

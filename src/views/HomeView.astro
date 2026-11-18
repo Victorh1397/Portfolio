@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
 import ProjectRow from '@/components/ProjectRow.astro';
 import ProjectFilter from '@/components/ProjectFilter.astro';
@@ -15,6 +16,12 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const projects = await getProjects(lang);
+
+// Foto opcional (specs/011 R6): si existe src/assets/profile/photo.*, el hero pasa a dos columnas.
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/profile/photo.{jpg,jpeg,png,webp}', {
+  eager: true,
+});
+const photo = Object.values(photos)[0]?.default;
 
 // Solo las áreas que aparecen en algún proyecto, en el orden canónico.
 const usedAreas = AREAS.filter((area) => projects.some((p) => p.data.areas.includes(area)));
@@ -39,9 +46,22 @@ const jsonLd = {
   current="home"
   jsonLd={jsonLd}
 >
-  <section class="hero container" aria-labelledby="hero-title">
+  <section class:list={['hero container', { 'has-photo': photo }]} aria-labelledby="hero-title">
     <p class="eyebrow">{t('home.eyebrow')}</p>
     <h1 id="hero-title">{t('home.title')}</h1>
+    {
+      photo && (
+        <Image
+          class="portrait"
+          src={photo}
+          alt={t('home.photoAlt')}
+          widths={[320, 480, 640, 800]}
+          sizes="(min-width: 900px) 22rem, 18rem"
+          loading="eager"
+          fetchpriority="high"
+        />
+      )
+    }
     <p class="intro">{t('home.intro')}</p>
   </section>
 
@@ -84,6 +104,51 @@ const jsonLd = {
       margin-left: auto;
       margin-right: 8%;
       margin-top: var(--space-l);
+    }
+  }
+
+  /* Con foto: texto a la izquierda, retrato 4:5 a la derecha. En móvil, el retrato va entre el titular y la intro. */
+  .portrait {
+    display: block;
+    width: min(100%, 18rem);
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    margin-top: var(--space-l);
+    filter: saturate(0.85);
+  }
+
+  @media (min-width: 900px) {
+    .hero.has-photo {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      grid-template-areas:
+        'eyebrow portrait'
+        'title   portrait'
+        'intro   portrait';
+      grid-template-rows: auto auto 1fr;
+      column-gap: var(--space-xl);
+    }
+
+    .has-photo .eyebrow {
+      grid-area: eyebrow;
+    }
+
+    .has-photo h1 {
+      grid-area: title;
+    }
+
+    .has-photo .intro {
+      grid-area: intro;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .has-photo .portrait {
+      grid-area: portrait;
+      width: 100%;
+      margin-top: 0;
+      align-self: start;
     }
   }
 

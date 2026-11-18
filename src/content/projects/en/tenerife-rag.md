@@ -7,6 +7,45 @@ stack: [OpenAI API, ChromaDB, Streamlit, PyPDF, jsonschema, Python]
 year: 2026
 order: 4
 context: Large Language Models · MSc in AI, Cloud Computing and DevOps (Pontia)
+diagram:
+  caption: The guide is indexed once. On every question, the model decides through tool calling whether to search it.
+  lanes:
+    - label: Ingestion (notebook, once)
+      offline: true
+      steps:
+        - nodes:
+            - title: PDF guide
+              detail: TENERIFE.pdf, extracted with PyPDF
+        - nodes:
+            - title: Chunking
+              detail: fixed length, 200-character overlap
+        - nodes:
+            - title: Embeddings
+              detail: text-embedding-3-small
+        - nodes:
+            - title: ChromaDB
+              detail: persisted to disk
+    - label: On every question (Streamlit app)
+      steps:
+        - label: Input
+          nodes:
+            - title: Chat
+              detail: 10-turn history, 1,000 characters max
+        - label: Orchestration
+          nodes:
+            - title: GPT-4.1-mini
+              detail: tool calling, 5 rounds max
+              accent: true
+        - label: Tools
+          nodes:
+            - title: search_tenerife_info
+              detail: top-k passages from ChromaDB
+            - title: get_weather
+              detail: simulated weather
+        - label: Answer
+          nodes:
+            - title: Answer with source
+              detail: the model writes from the context and cites the chunk
 ---
 
 ## Problem

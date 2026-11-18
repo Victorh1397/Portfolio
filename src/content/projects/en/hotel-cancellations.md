@@ -17,6 +17,40 @@ metrics:
     label: algorithms compared
   - value: '119,390'
     label: bookings in the dataset
+diagram:
+  caption: First, leak-free data and two scenarios depending on when the prediction is made. Then, from 15 algorithms to a served model.
+  lanes:
+    - label: Data
+      steps:
+        - label: Source
+          nodes:
+            - title: 119,390 bookings
+              detail: is_canceled as target
+        - label: Cleaning
+          nodes:
+            - title: Leaks removed
+              detail: reservation_status and its date, among others
+        - label: Feature sets
+          nodes:
+            - title: Pre-assignment
+              detail: without room_changed
+            - title: Post-assignment
+              detail: with room_changed
+    - label: Modelling
+      steps:
+        - nodes:
+            - title: Benchmark
+              detail: 15 algorithms on a sample
+        - nodes:
+            - title: Finalists
+              detail: retrained on the full dataset
+        - nodes:
+            - title: Optuna
+              detail: LightGBM, 24 h in Docker
+              accent: true
+        - nodes:
+            - title: FastAPI service
+              detail: one model per scenario
 ---
 
 ## Problem

@@ -24,6 +24,7 @@ const es = {
   'home.intro':
     'Soy Victor Mendez. Después de casi una década en petróleo y gas y más de cinco años en BI y datos para fintech, salud y agritech, hoy trabajo en recuperación aumentada (RAG), asistentes conversacionales y modelos predictivos, y respaldo cada decisión con especificaciones, tests y métricas reproducibles.',
   'home.projects': 'Proyectos',
+  'home.photoAlt': 'Retrato de Victor Mendez',
 
   'filter.label': 'Filtrar por área',
   'filter.all': 'Todos',
@@ -38,6 +39,7 @@ const es = {
   'area.platform': 'Plataforma',
 
   'project.metrics': 'Resultados clave',
+  'project.architecture': 'Arquitectura',
   'project.details': 'Ficha del proyecto',
   'project.context': 'Contexto',
   'project.team': 'Equipo',
@@ -100,6 +102,7 @@ const en: Record<Keys, string> = {
   'home.intro':
     'I’m Victor Mendez. After almost a decade in oil and gas and 5+ years in BI and data across fintech, healthcare and agritech, I now work on retrieval-augmented generation, conversational assistants and predictive models, backing every decision with specs, tests and reproducible metrics.',
   'home.projects': 'Projects',
+  'home.photoAlt': 'Portrait of Victor Mendez',
 
   'filter.label': 'Filter by area',
   'filter.all': 'All',
@@ -114,6 +117,7 @@ const en: Record<Keys, string> = {
   'area.platform': 'Platform',
 
   'project.metrics': 'Key results',
+  'project.architecture': 'Architecture',
   'project.details': 'Project details',
   'project.context': 'Context',
   'project.team': 'Team',

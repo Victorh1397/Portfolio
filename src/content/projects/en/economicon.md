@@ -8,6 +8,67 @@ year: 2026
 order: 1
 context: Master’s thesis · MSc in AI, Cloud Computing and DevOps (Pontia)
 team: EconomiconFinOps team
+diagram:
+  caption: Four services, each with one responsibility. Every query goes through the active tenant.
+  lanes:
+    - label: Application
+      steps:
+        - label: Interface
+          nodes:
+            - title: React frontend
+              detail: JWT and X-Tenant-Id on every request
+        - label: API
+          nodes:
+            - title: FastAPI backend
+              detail: auth, mandatory tenant, chat with retrieval
+              accent: true
+        - label: Processing and AI
+          nodes:
+            - title: RabbitMQ
+              detail: confirmed jobs
+            - title: Processor
+              detail: documents and embeddings
+            - title: LiteLLM
+              detail: model gateway, mock in development
+        - label: Data
+          nodes:
+            - title: CockroachDB
+              detail: operational data and costs
+            - title: Postgres + pgvector
+              detail: vectors scoped by tenant
+            - title: MinIO
+              detail: temporary originals
+    - label: Cost ingestion
+      offline: true
+      steps:
+        - nodes:
+            - title: Pinned public CSV
+              detail: Azure dataset
+        - nodes:
+            - title: Simulated Azure API
+              detail: Cost Management Query subset
+        - nodes:
+            - title: Ingestion CLI
+              detail: paginated, normalised and idempotent
+        - nodes:
+            - title: CockroachDB
+              detail: costs per tenant
+    - label: Observability
+      offline: true
+      steps:
+        - nodes:
+            - title: Prometheus
+              detail: /metrics from backend and processor
+        - nodes:
+            - title: Grafana
+              detail: data, anomaly and AI cost dashboards
+figures:
+  - src: ../../../assets/projects/economicon/anomalias.png
+    alt: Economicon anomaly dashboard showing estimated impact, open anomalies by severity and a filterable alert inbox.
+    caption: Anomaly and alert dashboard, with demo data. The interface is in Spanish.
+  - src: ../../../assets/projects/economicon/asistente.png
+    alt: Conversation with the Economicon assistant. The user asks why an anomaly was flagged and the assistant answers with the rule applied, the observed cost against the baseline and its limitations.
+    caption: The assistant explains an anomaly with the rule, the operands and its limits.
 ---
 
 ## Problem

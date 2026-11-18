@@ -20,6 +20,10 @@ Cada elemento visual tiene que ayudar a eso o desaparece.
 - **Paleta:** neutros cálidos (papel y tinta) y **un único color de acento**. Todos los colores son tokens en
   `src/styles/tokens.css`.
 - **Estructura:** índice numerado con filas separadas por líneas finas. No hay grids de tarjetas.
+- **Imágenes como evidencia** (añadido en la spec 011): solo entran imágenes que demuestran algo, como diagramas de
+  arquitectura, capturas reales, gráficos de resultados o el retrato de Victor. Cada una lleva `alt` y pie de foto.
+  Los diagramas se generan con HTML y CSS a partir de datos, no como imágenes. Quedan fuera las imágenes de stock,
+  las ilustraciones decorativas y las rejillas de logos de tecnologías. El índice de la home sigue siendo solo texto.
 - **Prohibido:** gradientes decorativos, glassmorphism, blobs, glow, sombras difusas grandes, emojis decorativos,
   iconos genéricos de IA (cerebros, chispas, robots), contadores animados, animaciones al hacer scroll,
   cursores personalizados, texto con efecto máquina de escribir.

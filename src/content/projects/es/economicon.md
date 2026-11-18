@@ -8,6 +8,67 @@ year: 2026
 order: 1
 context: Trabajo Fin de Máster · Máster en IA, Cloud Computing y DevOps (Pontia)
 team: Equipo EconomiconFinOps
+diagram:
+  caption: Cuatro servicios con una responsabilidad cada uno. Toda consulta pasa por el tenant activo.
+  lanes:
+    - label: Aplicación
+      steps:
+        - label: Interfaz
+          nodes:
+            - title: Frontend React
+              detail: JWT y X-Tenant-Id en cada petición
+        - label: API
+          nodes:
+            - title: Backend FastAPI
+              detail: auth, tenant obligatorio, chat con recuperación
+              accent: true
+        - label: Procesado e IA
+          nodes:
+            - title: RabbitMQ
+              detail: trabajos confirmados
+            - title: Processor
+              detail: documentos y embeddings
+            - title: LiteLLM
+              detail: gateway de modelos, mock en desarrollo
+        - label: Datos
+          nodes:
+            - title: CockroachDB
+              detail: datos operativos y costes
+            - title: Postgres + pgvector
+              detail: vectores filtrados por tenant
+            - title: MinIO
+              detail: originales temporales
+    - label: Ingesta de costes
+      offline: true
+      steps:
+        - nodes:
+            - title: CSV público fijado
+              detail: dataset de Azure
+        - nodes:
+            - title: API Azure simulada
+              detail: subconjunto de Cost Management Query
+        - nodes:
+            - title: CLI de ingesta
+              detail: paginada, normalizada e idempotente
+        - nodes:
+            - title: CockroachDB
+              detail: costes por tenant
+    - label: Observabilidad
+      offline: true
+      steps:
+        - nodes:
+            - title: Prometheus
+              detail: /metrics del backend y del processor
+        - nodes:
+            - title: Grafana
+              detail: paneles de datos, anomalías y coste de IA
+figures:
+  - src: ../../../assets/projects/economicon/anomalias.png
+    alt: Panel de anomalías de Economicon con el impacto estimado, las anomalías abiertas por criticidad y una bandeja de alertas filtrable.
+    caption: Panel de anomalías y alertas, con datos de demostración.
+  - src: ../../../assets/projects/economicon/asistente.png
+    alt: Conversación con el asistente de Economicon. El usuario pregunta por qué se marcó una anomalía y el asistente responde con la regla aplicada, el coste observado frente a la referencia y sus limitaciones.
+    caption: El asistente explica una anomalía con la regla, los operandos y sus límites.
 ---
 
 ## Problema

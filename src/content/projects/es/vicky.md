@@ -18,6 +18,53 @@ metrics:
     label: mediana por turno en una conversación hablada
   - value: '313'
     label: tests automáticos
+diagram:
+  caption: Un turno hablado hace un solo viaje. El OCR y el índice se preparan antes, fuera de línea.
+  lanes:
+    - label: En cada turno
+      steps:
+        - label: Canales
+          nodes:
+            - title: Voz
+              detail: micrófono, fin por silencio
+            - title: Telegram
+              detail: mensajes y botones
+        - label: Diálogo
+          nodes:
+            - title: Dialogflow ES
+              detail: STT y TTS nativos, 13 intenciones
+        - label: Reglas
+          nodes:
+            - title: Webhook FastAPI
+              detail: cédula con regex, agenda, SSML
+              accent: true
+        - label: Recuperación
+          nodes:
+            - title: FAISS
+              detail: fragmentos más cercanos a la pregunta
+        - label: Respuesta
+          nodes:
+            - title: Gemini
+              detail: solo con los documentos, o NO_DISPONIBLE
+    - label: Fuera de línea, una vez
+      offline: true
+      steps:
+        - nodes:
+            - title: Documentos D1–D5
+              detail: JPG escaneados, ficticios
+        - nodes:
+            - title: OCR Tesseract
+              detail: español, con preprocesado
+        - nodes:
+            - title: Regex
+              detail: validación de precios y horarios
+        - nodes:
+            - title: Índice
+              detail: fragmentos y embeddings, se carga al arrancar
+figures:
+  - src: ../../../assets/projects/vicky/tarifario.jpg
+    alt: Documento escaneado ficticio "Tarifario de consultas" de Grupo Médico Visoria, con una tabla de especialidades, médicos y precios en dólares.
+    caption: Uno de los cinco documentos ficticios que el pipeline lee con OCR. Vicky responde solo con lo que contienen.
 ---
 
 ## Problema

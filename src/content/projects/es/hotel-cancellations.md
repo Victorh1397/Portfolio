@@ -17,6 +17,40 @@ metrics:
     label: algoritmos comparados
   - value: '119.390'
     label: reservas en el dataset
+diagram:
+  caption: Primero, datos sin fugas y dos escenarios según el momento de la predicción. Después, de 15 algoritmos a un modelo servido.
+  lanes:
+    - label: Datos
+      steps:
+        - label: Origen
+          nodes:
+            - title: 119.390 reservas
+              detail: is_canceled como objetivo
+        - label: Limpieza
+          nodes:
+            - title: Fugas eliminadas
+              detail: reservation_status y su fecha, entre otras
+        - label: Feature sets
+          nodes:
+            - title: Pre-asignación
+              detail: sin room_changed
+            - title: Post-asignación
+              detail: con room_changed
+    - label: Modelado
+      steps:
+        - nodes:
+            - title: Benchmark
+              detail: 15 algoritmos sobre una muestra
+        - nodes:
+            - title: Finalistas
+              detail: reentrenados con todo el dataset
+        - nodes:
+            - title: Optuna
+              detail: LightGBM, 24 h en Docker
+              accent: true
+        - nodes:
+            - title: API FastAPI
+              detail: un modelo por escenario
 ---
 
 ## Problema

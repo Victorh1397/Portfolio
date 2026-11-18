@@ -16,6 +16,52 @@ metrics:
     label: latencia p50 en CPU
   - value: '379'
     label: tests automáticos
+diagram:
+  caption: Un mismo índice sirve a la búsqueda y a los duplicados, y un oráculo exacto mide si el índice pierde candidatos.
+  lanes:
+    - label: Ingesta
+      steps:
+        - label: Datos
+          nodes:
+            - title: Catálogo de 15.000 productos
+              detail: 10 ficheros verificados por SHA-256
+        - label: Representación
+          nodes:
+            - title: Composición del texto
+              detail: 3 estrategias comparadas (E0–E3)
+            - title: Embeddings e5-base
+              detail: 768 dim, normalizados, con caché
+        - label: Almacén
+          nodes:
+            - title: Qdrant
+              detail: HNSW aproximado, lo que se entrega
+              accent: true
+            - title: Oráculo NumPy
+              detail: búsqueda exacta, la vara de medir
+    - label: Consulta y evaluación
+      steps:
+        - label: Recuperación
+          nodes:
+            - title: Búsqueda densa
+              detail: filtro de marca dentro del motor
+            - title: TF-IDF
+              detail: línea base
+        - label: Aplicaciones
+          nodes:
+            - title: Duplicados
+              detail: umbral calibrado y congelado
+            - title: Eventos
+              detail: 24 mutaciones en orden
+        - label: Evaluación
+          nodes:
+            - title: Métricas
+              detail: nDCG, Recall, MRR
+            - title: Fidelidad y atribución
+              detail: motor frente a oráculo, qué capa falla
+        - label: Entrega
+          nodes:
+            - title: Artefactos
+              detail: validados contra el contrato antes de escribir
 ---
 
 ## Problema

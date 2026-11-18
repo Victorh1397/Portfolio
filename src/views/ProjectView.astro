@@ -1,6 +1,8 @@
 ---
 import { render } from 'astro:content';
+import { Image } from 'astro:assets';
 import Base from '@/layouts/Base.astro';
+import Flow from '@/components/Flow.astro';
 import '@/styles/prose.css';
 import { locales, useTranslations, type Lang } from '@/i18n/ui';
 import { alternates, routes } from '@/i18n/routes';
@@ -69,6 +71,8 @@ const jsonLd = {
       )
     }
 
+    {data.diagram && <Flow diagram={data.diagram} lang={lang} />}
+
     <div class="layout">
       <aside class="facts" aria-label={t('project.details')}>
         <dl>
@@ -135,8 +139,25 @@ const jsonLd = {
         </ul>
       </aside>
 
-      <div class="prose body">
-        <Content />
+      <div class="body">
+        <div class="prose">
+          <Content />
+        </div>
+        {
+          data.figures?.map((fig) => (
+            <figure class="shot">
+              <Image
+                src={fig.src}
+                alt={fig.alt}
+                widths={[480, 800, 1200, Math.min(fig.src.width, 1600)]}
+                sizes="(min-width: 900px) 46rem, 100vw"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="mono">{fig.caption}</figcaption>
+            </figure>
+          ))
+        }
       </div>
     </div>
 
@@ -335,5 +356,31 @@ const jsonLd = {
     font-family: var(--font-display);
     font-size: var(--step-1);
     line-height: var(--leading-snug);
+  }
+</style>
+
+<style>
+  /* Capturas reales (specs/011 R5) */
+  .shot {
+    margin-top: var(--space-l);
+    max-width: var(--measure);
+  }
+
+  .shot img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+  }
+
+  .shot figcaption {
+    margin-top: var(--space-2xs);
+    color: var(--muted);
+  }
+</style>
+
+<style>
+  /* Sin métricas, el diagrama va justo después de la cabecera, que ya trae su propio espacio. */
+  .head + :global(.flow) {
+    margin-top: 0;
   }
 </style>

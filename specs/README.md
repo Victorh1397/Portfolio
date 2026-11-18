@@ -41,6 +41,7 @@ draft ──► approved ──► in-progress ──► done
 | [008 SEO and analytics](008-seo-analytics/spec.md) | done |
 | [009 Deploy](009-deploy/spec.md) | in-progress (falta conectar Cloudflare) |
 | [010 Experience and web CV](010-experience-and-web-cv/spec.md) | done |
+| [011 Visual evidence](011-visual-evidence/spec.md) | done |
 
 ## Cuándo NO hace falta spec
 

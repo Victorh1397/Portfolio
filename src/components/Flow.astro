@@ -1,0 +1,182 @@
+---
+// Diagrama de arquitectura renderizado desde datos (specs/011 R1–R4, R7): HTML y CSS, sin JS ni imágenes.
+// En escritorio cada lane es un flujo horizontal; por debajo de 900 px, los pasos se apilan en vertical.
+import type { CollectionEntry } from 'astro:content';
+import { useTranslations, type Lang } from '@/i18n/ui';
+
+type Diagram = NonNullable<CollectionEntry<'projects'>['data']['diagram']>;
+
+interface Props {
+  diagram: Diagram;
+  lang: Lang;
+}
+
+const { diagram, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<figure class="flow">
+  <figcaption>
+    <span class="eyebrow">{t('project.architecture')}</span>
+    <span class="caption">{diagram.caption}</span>
+  </figcaption>
+
+  {
+    diagram.lanes.map((lane) => (
+      <section class:list={['lane', { offline: lane.offline }]} aria-label={lane.label}>
+        {lane.label && <p class="lane-label mono" aria-hidden="true">{lane.label}</p>}
+        <ol class="steps" style={`--cols: ${lane.steps.length}`}>
+          {lane.steps.map((step) => (
+            <li class="step">
+              {step.label && <p class="step-label mono">{step.label}</p>}
+              <ul class="nodes" role="list">
+                {step.nodes.map((node) => (
+                  <li class:list={['node', { accent: node.accent }]}>
+                    <span class="node-title">{node.title}</span>
+                    {node.detail && <span class="node-detail">{node.detail}</span>}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</figure>
+
+<style>
+  .flow {
+    margin-top: var(--space-xl);
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs) var(--space-s);
+    margin-bottom: var(--space-s);
+  }
+
+  .caption {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  .lane {
+    padding: var(--space-s);
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+
+  .lane + .lane {
+    margin-top: var(--space-xs);
+  }
+
+  .lane.offline {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--rule-strong);
+  }
+
+  .lane-label {
+    margin-bottom: var(--space-xs);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+  }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    row-gap: var(--space-l);
+  }
+
+  /* Etiqueta arriba y nodos centrados en el espacio restante: las etiquetas de una lane quedan alineadas. */
+  .step {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nodes {
+    position: relative;
+    margin-block: auto;
+  }
+
+  /* Flecha entre pasos, anclada a los nodos: ↓ en móvil, → en escritorio. */
+  .step:not(:last-child) .nodes::after {
+    content: '↓';
+    position: absolute;
+    left: var(--space-s);
+    bottom: calc(-1 * var(--space-l));
+    height: var(--space-l);
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      column-gap: var(--space-l);
+    }
+
+    .step:not(:last-child) .nodes::after {
+      content: '→';
+      left: auto;
+      bottom: auto;
+      right: calc(-1 * var(--space-l));
+      top: 50%;
+      width: var(--space-l);
+      height: auto;
+      transform: translateY(-50%);
+    }
+  }
+
+  .step-label {
+    margin-bottom: var(--space-2xs);
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .nodes {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-2xs) var(--space-xs);
+    background: var(--bg);
+    border: 1px solid var(--rule-strong);
+  }
+
+  .node.accent {
+    border-color: var(--accent);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+
+  .node-title {
+    font-size: var(--step--1);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .node.accent .node-title {
+    color: var(--accent);
+  }
+
+  .node-detail {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+</style>
