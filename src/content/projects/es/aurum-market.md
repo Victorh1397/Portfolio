@@ -2,7 +2,7 @@
 title: Aurum Market, búsqueda semántica de catálogo
 summary: Motor de descubrimiento sobre 15.000 productos en español con Qdrant y embeddings E5. Hace búsqueda por intención y detecta altas duplicadas, sin ningún LLM en tiempo de ejecución.
 repo: Victorh1397/Actividad_BBDD_Vectorial
-areas: [vector, ml]
+areas: [vector]
 stack: [Qdrant, multilingual-e5-base, NumPy, Python, uv, Docker, pytest]
 year: 2026
 order: 3

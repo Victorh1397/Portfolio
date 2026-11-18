@@ -2,7 +2,7 @@
 title: Aurum Market, semantic catalogue search
 summary: A product discovery engine over 15,000 Spanish-language products, built on Qdrant and E5 embeddings. It searches by intent and catches duplicate listings, with no LLM at runtime.
 repo: Victorh1397/Actividad_BBDD_Vectorial
-areas: [vector, ml]
+areas: [vector]
 stack: [Qdrant, multilingual-e5-base, NumPy, Python, uv, Docker, pytest]
 year: 2026
 order: 3
