@@ -1,0 +1,123 @@
+---
+import { useTranslations, type Lang } from '@/i18n/ui';
+import { routes } from '@/i18n/routes';
+import { pad, type Project } from '@/lib/projects';
+
+interface Props {
+  project: Project;
+  index: number;
+  lang: Lang;
+}
+
+const { project, index, lang } = Astro.props;
+const t = useTranslations(lang);
+const { title, summary, areas, year } = project.data;
+---
+
+<li class="row" data-areas={areas.join(' ')}>
+  <span class="num mono" aria-hidden="true">{pad(index + 1)}</span>
+  <div class="main">
+    <h3 class="title" style={`view-transition-name: project-${project.slug}`}>
+      <a href={routes.project(lang, project.slug)}>{title}</a>
+    </h3>
+    <p class="summary">{summary}</p>
+  </div>
+  <p class="areas mono">{areas.map((a) => t(`area.${a}`)).join(' · ')}</p>
+  <p class="year mono">{year}</p>
+  <span class="arrow" aria-hidden="true">→</span>
+</li>
+
+<style>
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    grid-template-areas:
+      'num main main'
+      'num areas year';
+    gap: var(--space-2xs) var(--space-s);
+    padding-block: var(--space-m);
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (min-width: 900px) {
+    .row {
+      grid-template-columns: 3.5rem minmax(0, 1fr) 13rem 3.5rem 1.5rem;
+      grid-template-areas: 'num main areas year arrow';
+      align-items: baseline;
+      column-gap: var(--space-m);
+      padding-block: var(--space-l);
+    }
+  }
+
+  .num {
+    grid-area: num;
+    color: var(--muted);
+    padding-top: 0.35em;
+  }
+
+  .main {
+    grid-area: main;
+  }
+
+  .title {
+    font-size: var(--step-3);
+    font-variation-settings: 'opsz' 60;
+  }
+
+  .title a {
+    text-decoration: none;
+  }
+
+  /* Toda la fila es clicable; el foco sigue siendo un único enlace (specs/006 R5). */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .summary {
+    margin-top: var(--space-2xs);
+    max-width: 58ch;
+    color: var(--muted);
+  }
+
+  .areas {
+    grid-area: areas;
+    color: var(--muted);
+  }
+
+  .year {
+    grid-area: year;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .arrow {
+    display: none;
+    grid-area: arrow;
+    color: var(--muted);
+    transition: transform var(--duration) var(--ease), color var(--duration) var(--ease);
+  }
+
+  @media (min-width: 900px) {
+    .arrow {
+      display: block;
+    }
+  }
+
+  .row:hover .title a,
+  .row:focus-within .title a {
+    color: var(--accent);
+  }
+
+  .row:hover .arrow,
+  .row:focus-within .arrow {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .row:focus-within {
+    outline: none;
+  }
+</style>

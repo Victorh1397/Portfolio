@@ -1,0 +1,123 @@
+---
+import { useTranslations, type Lang } from '@/i18n/ui';
+import type { Area } from '@/content.config';
+
+interface Props {
+  lang: Lang;
+  areas: Area[];
+  total: number;
+  /** id de la lista que filtra */
+  target: string;
+}
+
+const { lang, areas, total, target } = Astro.props;
+const t = useTranslations(lang);
+const countText = (n: number) =>
+  n === 1 ? t('filter.count.one') : t('filter.count.other', { n });
+---
+
+<div class="filter" data-filter={target}>
+  <!-- Sin JS, el grupo de botones no aparece y se ven todos los proyectos (specs/006 R4). -->
+  <div class="buttons" role="group" aria-label={t('filter.label')} hidden>
+    <button type="button" data-area="all" aria-pressed="true">{t('filter.all')}</button>
+    {
+      areas.map((area) => (
+        <button type="button" data-area={area} aria-pressed="false">
+          {t(`area.${area}`)}
+        </button>
+      ))
+    }
+  </div>
+  <p
+    class="status mono"
+    aria-live="polite"
+    data-one={t('filter.count.one')}
+    data-other={t('filter.count.other')}
+  >
+    {countText(total)}
+  </p>
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-filter]')) {
+    const list = document.getElementById(root.dataset.filter!);
+    const group = root.querySelector<HTMLElement>('.buttons');
+    const status = root.querySelector<HTMLElement>('.status');
+    if (!list || !group || !status) continue;
+
+    const rows = Array.from(list.querySelectorAll<HTMLElement>('[data-areas]'));
+    const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('button'));
+
+    const apply = (area: string) => {
+      let visible = 0;
+      for (const row of rows) {
+        const match = area === 'all' || row.dataset.areas!.split(' ').includes(area);
+        row.hidden = !match;
+        if (match) visible++;
+      }
+      for (const button of buttons) {
+        button.setAttribute('aria-pressed', String(button.dataset.area === area));
+      }
+      const template = visible === 1 ? status.dataset.one! : status.dataset.other!;
+      status.textContent = template.replace('{n}', String(visible));
+    };
+
+    group.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-area]');
+      if (button) apply(button.dataset.area!);
+    });
+
+    group.hidden = false;
+  }
+</script>
+
+<style>
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-bottom: var(--space-m);
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+
+  .buttons[hidden] {
+    display: none;
+  }
+
+  button {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    padding: 0.3rem 0.7rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease),
+      background-color var(--duration) var(--ease);
+  }
+
+  button:hover {
+    color: var(--fg);
+    border-color: var(--rule-strong);
+  }
+
+  button[aria-pressed='true'] {
+    color: var(--bg);
+    background: var(--fg);
+    border-color: var(--fg);
+  }
+
+  .status {
+    color: var(--muted);
+  }
+</style>

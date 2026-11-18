@@ -1,0 +1,339 @@
+---
+import { render } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import '@/styles/prose.css';
+import { locales, useTranslations, type Lang } from '@/i18n/ui';
+import { alternates, routes } from '@/i18n/routes';
+import { pad, type Project } from '@/lib/projects';
+import { formatMonth, getRepoMeta, repoUrl } from '@/lib/github';
+import { site } from '@/config/site';
+
+interface Props {
+  lang: Lang;
+  project: Project;
+  index: number;
+  prev: Project | null;
+  next: Project | null;
+}
+
+const { lang, project, index, prev, next } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await render(project);
+const data = project.data;
+const meta = await getRepoMeta(data.repo);
+const repo = repoUrl(data.repo);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: data.title,
+  description: data.summary,
+  codeRepository: repo,
+  programmingLanguage: meta?.language ?? undefined,
+  inLanguage: locales[lang].html,
+  dateModified: meta?.pushedAt?.toISOString(),
+  keywords: data.stack.join(', '),
+  author: { '@type': 'Person', name: site.name },
+};
+---
+
+<Base
+  lang={lang}
+  title={`${data.title} · ${site.name}`}
+  description={data.summary}
+  alternates={alternates((l) => routes.project(l, project.slug))}
+  current="project"
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <article class="container">
+    <header class="head">
+      <a class="back mono" href={`${routes.home(lang)}#proyectos`}>← {t('project.all')}</a>
+      <p class="eyebrow">{pad(index + 1)} · {data.year}</p>
+      <h1 style={`view-transition-name: project-${project.slug}`}>{data.title}</h1>
+      <p class="lead">{data.summary}</p>
+    </header>
+
+    {
+      data.metrics && data.metrics.length > 0 && (
+        <section class="metrics" aria-label={t('project.metrics')}>
+          <dl>
+            {data.metrics.map((m) => (
+              <div>
+                <dd>{m.value}</dd>
+                <dt class="mono">{m.label}</dt>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    <div class="layout">
+      <aside class="facts" aria-label={t('project.details')}>
+        <dl>
+          <div>
+            <dt>{t('project.context')}</dt>
+            <dd>{data.context}</dd>
+          </div>
+          {
+            data.team && (
+              <div>
+                <dt>{t('project.team')}</dt>
+                <dd>{data.team}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>{t('project.year')}</dt>
+            <dd>{data.year}</dd>
+          </div>
+          <div>
+            <dt>{t('project.areas')}</dt>
+            <dd>{data.areas.map((a) => t(`area.${a}`)).join(' · ')}</dd>
+          </div>
+          <div>
+            <dt>{t('project.stack')}</dt>
+            <dd>
+              <ul class="stack">
+                {data.stack.map((s) => <li>{s}</li>)}
+              </ul>
+            </dd>
+          </div>
+          {
+            meta?.language && (
+              <div>
+                <dt>{t('project.language')}</dt>
+                <dd>{meta.language}</dd>
+              </div>
+            )
+          }
+          {
+            meta?.pushedAt && (
+              <div>
+                <dt>{t('project.updated')}</dt>
+                <dd>
+                  <time datetime={meta.pushedAt.toISOString()}>
+                    {formatMonth(meta.pushedAt, locales[lang].html)}
+                  </time>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+        <ul class="links">
+          <li>
+            <a href={repo} rel="noopener">{t('project.repo')} ↗</a>
+          </li>
+          {
+            data.demo && (
+              <li>
+                <a href={data.demo} rel="noopener">{t('project.demo')} ↗</a>
+              </li>
+            )
+          }
+        </ul>
+      </aside>
+
+      <div class="prose body">
+        <Content />
+      </div>
+    </div>
+
+    <nav class="pager" aria-label={t('project.pagination')}>
+      {
+        prev ? (
+          <a class="prev" href={routes.project(lang, prev.slug)} rel="prev">
+            <span class="mono">← {t('project.prev')}</span>
+            <span class="pager-title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a class="next" href={routes.project(lang, next.slug)} rel="next">
+            <span class="mono">{t('project.next')} →</span>
+            <span class="pager-title">{next.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .head {
+    padding-block: var(--space-l) var(--space-xl);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-l);
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  h1 {
+    margin-top: var(--space-s);
+    max-width: 20ch;
+    font-size: var(--step-4);
+    font-variation-settings: 'opsz' 72;
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    margin-top: var(--space-m);
+    max-width: 56ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* Métricas: fila tipográfica, sin animación */
+  .metrics dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--fg);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  @media (min-width: 900px) {
+    .metrics dl {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .metrics dl > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-m) var(--space-m) var(--space-m) 0;
+  }
+
+  .metrics dd {
+    order: -1;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    font-variation-settings: 'opsz' 72;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .metrics dt {
+    color: var(--muted);
+    max-width: 24ch;
+  }
+
+  .layout {
+    display: grid;
+    gap: var(--space-l);
+    margin-top: var(--space-xl);
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: var(--space-m);
+    }
+
+    .body {
+      grid-column: 1 / span 8;
+      grid-row: 1;
+    }
+
+    .facts {
+      grid-column: 10 / span 3;
+      grid-row: 1;
+      align-self: start;
+      position: sticky;
+      top: var(--space-m);
+    }
+  }
+
+  .facts dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--space-s) var(--space-m);
+  }
+
+  @media (min-width: 900px) {
+    .facts dl {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .facts dd {
+    margin-top: var(--space-3xs);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .stack {
+    list-style: none;
+    padding: 0;
+  }
+
+  .links {
+    list-style: none;
+    padding: var(--space-s) 0 0;
+    margin-top: var(--space-m);
+    border-top: 1px solid var(--rule);
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .links a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--rule);
+  }
+
+  .pager a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    text-decoration: none;
+  }
+
+  .pager .mono {
+    color: var(--muted);
+  }
+
+  .next {
+    text-align: right;
+    grid-column: 2;
+  }
+
+  .pager-title {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+  }
+</style>

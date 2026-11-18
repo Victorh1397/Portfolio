@@ -1,0 +1,107 @@
+---
+import Base from '@/layouts/Base.astro';
+import ProjectRow from '@/components/ProjectRow.astro';
+import ProjectFilter from '@/components/ProjectFilter.astro';
+import { AREAS } from '@/content.config';
+import { useTranslations, type Lang } from '@/i18n/ui';
+import { alternates, routes } from '@/i18n/routes';
+import { getProjects } from '@/lib/projects';
+import { contactLinks, site } from '@/config/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const projects = await getProjects(lang);
+
+// Solo las áreas que aparecen en algún proyecto, en el orden canónico.
+const usedAreas = AREAS.filter((area) => projects.some((p) => p.data.areas.includes(area)));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: new URL(routes.home(lang), Astro.site).href,
+  jobTitle: t('home.eyebrow'),
+  sameAs: contactLinks()
+    .filter((l) => l.key !== 'email')
+    .map((l) => l.href),
+};
+---
+
+<Base
+  lang={lang}
+  title={t('meta.home.title')}
+  description={t('meta.home.description')}
+  alternates={alternates(routes.home)}
+  current="home"
+  jsonLd={jsonLd}
+>
+  <section class="hero container" aria-labelledby="hero-title">
+    <p class="eyebrow">{t('home.eyebrow')}</p>
+    <h1 id="hero-title">{t('home.title')}</h1>
+    <p class="intro">{t('home.intro')}</p>
+  </section>
+
+  <section id="proyectos" class="projects container" aria-labelledby="projects-title">
+    <div class="projects-head">
+      <h2 id="projects-title">{t('home.projects')}</h2>
+    </div>
+
+    <ProjectFilter lang={lang} areas={usedAreas} total={projects.length} target="project-list" />
+
+    <ol id="project-list" class="list" role="list">
+      {projects.map((project, i) => <ProjectRow project={project} index={i} lang={lang} />)}
+    </ol>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  .hero h1 {
+    margin-top: var(--space-s);
+    max-width: 14ch;
+    font-size: var(--step-5);
+    font-variation-settings: 'opsz' 72;
+    letter-spacing: -0.025em;
+  }
+
+  .intro {
+    margin-top: var(--space-m);
+    max-width: 46ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  @media (min-width: 900px) {
+    .intro {
+      margin-left: auto;
+      margin-right: 8%;
+      margin-top: var(--space-l);
+    }
+  }
+
+  .projects {
+    scroll-margin-top: var(--space-m);
+  }
+
+  .projects-head {
+    margin-bottom: var(--space-m);
+  }
+
+  .projects-head h2 {
+    font-size: var(--step-2);
+  }
+
+  .list {
+    list-style: none;
+    padding: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>
