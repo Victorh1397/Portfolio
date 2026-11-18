@@ -1,0 +1,35 @@
+---
+import { locales, otherLang, useTranslations, type Lang } from '@/i18n/ui';
+import type { Alternates } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+  alternates: Alternates;
+}
+
+const { lang, alternates } = Astro.props;
+const t = useTranslations(lang);
+const target = otherLang(lang);
+---
+
+<a
+  class="lang mono"
+  href={alternates[target]}
+  hreflang={locales[target].html}
+  lang={locales[target].html}
+  aria-label={t('lang.switch')}
+>
+  {t('lang.short')}
+</a>
+
+<style>
+  .lang {
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .lang:hover {
+    color: var(--fg);
+  }
+</style>
