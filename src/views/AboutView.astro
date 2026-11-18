@@ -1,0 +1,165 @@
+---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { getEntry, render } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Experience from '@/components/Experience.astro';
+import '@/styles/prose.css';
+import { useTranslations, type Lang } from '@/i18n/ui';
+import { alternates, routes } from '@/i18n/routes';
+import { contactLinks, site } from '@/config/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const page = await getEntry('pages', `${lang}/about`);
+if (!page) throw new Error(`[about] Falta src/content/pages/${lang}/about.md`);
+const { Content } = await render(page);
+
+const links = contactLinks();
+
+// specs/007 R4: el enlace al CV solo aparece si el PDF existe en public/.
+const cvPath = site.cv[lang];
+// Se resuelve desde la raíz del proyecto: en build, import.meta.url apunta al chunk compilado.
+const cvExists = existsSync(join(process.cwd(), 'public', cvPath));
+---
+
+<Base
+  lang={lang}
+  title={`${page.data.title} · ${site.name}`}
+  description={page.data.description}
+  alternates={alternates(routes.about)}
+  current="about"
+  ogType="profile"
+>
+  <div class="container">
+    <header class="head">
+      <h1>{page.data.title}</h1>
+      <p class="lead">{page.data.lead}</p>
+    </header>
+
+    <div class="layout">
+      <div class="main">
+        <div class="prose">
+          <Content />
+        </div>
+        <Experience lang={lang} />
+      </div>
+
+      {
+        (links.length > 0 || cvExists) && (
+          <aside class="contact" aria-labelledby="contact-title">
+            <h2 id="contact-title" class="eyebrow">{t('about.contact')}</h2>
+            <dl>
+              {links.map((link) => (
+                <div>
+                  <dt class="mono">{t(`contact.${link.key}`)}</dt>
+                  <dd>
+                    <a href={link.href} rel={link.key === 'email' ? undefined : 'me noopener'}>
+                      {link.label}
+                    </a>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            {cvExists && (
+              <a class="cv" href={`/${cvPath}`} download={`Victor-Mendez-CV-${lang.toUpperCase()}.pdf`}>
+                {t('about.cv')} ↓
+              </a>
+            )}
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  .head {
+    padding-block: var(--space-xl);
+  }
+
+  h1 {
+    font-size: var(--step-5);
+    font-variation-settings: 'opsz' 72;
+    letter-spacing: -0.025em;
+  }
+
+  .lead {
+    margin-top: var(--space-m);
+    max-width: 40ch;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-variation-settings: 'opsz' 36;
+    line-height: var(--leading-snug);
+  }
+
+  .layout {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: var(--space-m);
+    }
+
+    .main {
+      grid-column: 1 / span 7;
+    }
+
+    .contact {
+      grid-column: 9 / span 4;
+      align-self: start;
+      position: sticky;
+      top: var(--space-m);
+    }
+  }
+
+  .contact {
+    padding-top: var(--space-s);
+    border-top: 1px solid var(--fg);
+  }
+
+  .contact dl {
+    margin-top: var(--space-s);
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .contact dt {
+    color: var(--muted);
+  }
+
+  .contact dd a {
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .contact dd a:hover {
+    text-decoration: underline;
+  }
+
+  .cv {
+    display: inline-block;
+    margin-top: var(--space-m);
+    padding: var(--space-2xs) var(--space-s);
+    border: 1px solid var(--fg);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-decoration: none;
+    transition:
+      background-color var(--duration) var(--ease),
+      color var(--duration) var(--ease);
+  }
+
+  .cv:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+</style>
