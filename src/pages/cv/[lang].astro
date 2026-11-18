@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CvView from '@/views/CvView.astro';
+import type { Lang } from '@/i18n/ui';
+
+// /cv/es/ y /cv/en/: fuente HTML del CV en PDF (specs/010). noindex y fuera del sitemap.
+export const getStaticPaths = (() => [{ params: { lang: 'es' } }, { params: { lang: 'en' } }]) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+---
+
+<CvView lang={lang} />

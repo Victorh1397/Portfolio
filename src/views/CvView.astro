@@ -1,0 +1,316 @@
+---
+// CV imprimible en A4, sin teléfono ni dirección (specs/010 R4, R6).
+// Lo convierte a PDF `npm run cv`. No usa el layout del sitio: no lleva header, footer ni toggle de tema.
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-500.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import { locales, useTranslations, type Lang } from '@/i18n/ui';
+import { routes } from '@/i18n/routes';
+import { site } from '@/config/site';
+import { cv, formatYearMonth } from '@/data/cv';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const present = t('cv.present');
+const portfolio = new URL(routes.home(lang), Astro.site);
+const strip = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const education = cv.education.filter((e) => e.inCv);
+---
+
+<!doctype html>
+<html lang={locales[lang].html}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{`${site.name} · ${t('cv.title')}`}</title>
+  </head>
+  <body>
+    <main class="page">
+      <header class="head">
+        <h1>Victor H. Mendez D.</h1>
+        <div class="line headline-row">
+          <p class="headline">{cv.headline[lang]}</p>
+          <p class="location">{cv.location[lang]}</p>
+        </div>
+        <ul class="contact">
+          {site.email && <li><a href={`mailto:${site.email}`}>{site.email}</a></li>}
+          {site.linkedin && <li><a href={site.linkedin}>{strip(site.linkedin)}</a></li>}
+          {site.github && <li><a href={`https://github.com/${site.github}`}>github.com/{site.github}</a></li>}
+          <li><a href={portfolio.href}>{strip(portfolio.href)}</a></li>
+        </ul>
+      </header>
+
+      <section>
+        <h2>{t('cv.summary')}</h2>
+        <p>{cv.summary[lang]}</p>
+      </section>
+
+      <section>
+        <h2>{t('cv.skills')}</h2>
+        <dl class="skills">
+          {
+            cv.skills.map((group) => (
+              <div>
+                <dt>{group.label[lang]}</dt>
+                <dd>{group.items[lang].join(' · ')}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+
+      <section>
+        <h2>{t('cv.experience')}</h2>
+        {
+          cv.experience.map((job) => (
+            <article class="job">
+              <div class="line">
+                <h3>{job.company}</h3>
+                <span class="muted">{job.sector[lang]} · {job.location[lang]}</span>
+              </div>
+              {job.roles.map((role) => (
+                <div class="role">
+                  <div class="line">
+                    <p class="title">{role.title[lang]}</p>
+                    <span class="dates">
+                      {formatYearMonth(role.start, lang, present)} – {formatYearMonth(role.end, lang, present)}
+                    </span>
+                  </div>
+                  <ul>
+                    {role.highlights[lang].map((h) => (
+                      <li>{h}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </article>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>{t('cv.education')}</h2>
+        {
+          education.map((ed) => (
+            <article class="job">
+              <div class="line">
+                <h3>{ed.institution}</h3>
+                {ed.location && <span class="muted">{ed.location[lang]}</span>}
+              </div>
+              <div class="line">
+                <p class="title">{ed.degree[lang]}</p>
+                <span class="dates">
+                  {ed.start ? `${formatYearMonth(ed.start, lang, present)} – ` : ''}
+                  {formatYearMonth(ed.end, lang, present)}
+                </span>
+              </div>
+              {ed.detail && <p class="muted">{ed.detail[lang]}</p>}
+            </article>
+          ))
+        }
+      </section>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  @page {
+    size: A4;
+    margin: 12mm 15mm;
+  }
+
+  :root {
+    --ink: #1b1a17;
+    --muted: #5f5b53;
+    --rule: #d6d0c3;
+    --accent: #b2401a;
+    color-scheme: light;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  html {
+    background: #e9e5dc;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 9pt;
+    line-height: 1.34;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 13mm 15mm;
+    background: #fff;
+  }
+
+  @media print {
+    html {
+      background: #fff;
+    }
+
+    .page {
+      max-width: none;
+      padding: 0;
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .head {
+    padding-bottom: 3.5mm;
+    border-bottom: 1.2pt solid var(--ink);
+  }
+
+  h1 {
+    font-family: 'Newsreader Variable', Georgia, serif;
+    font-variation-settings: 'opsz' 72;
+    font-weight: 400;
+    font-size: 25pt;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .headline {
+    margin-top: 1.6mm;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.4pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 3.2mm;
+    margin-top: 2mm;
+    padding: 0;
+    list-style: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.8pt;
+    color: var(--muted);
+  }
+
+  .contact li + li::before {
+    content: '·';
+    margin-right: 3.2mm;
+    color: var(--rule);
+  }
+
+  section {
+    margin-top: 3.6mm;
+  }
+
+  h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 400;
+    font-size: 8pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 1mm;
+    margin-bottom: 1.8mm;
+    border-bottom: 0.6pt solid var(--rule);
+  }
+
+  .job {
+    break-inside: avoid;
+  }
+
+  .job + .job {
+    margin-top: 2.2mm;
+  }
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4mm;
+  }
+
+  h3 {
+    font-family: 'Newsreader Variable', Georgia, serif;
+    font-variation-settings: 'opsz' 24;
+    font-weight: 500;
+    font-size: 11pt;
+    line-height: 1.2;
+  }
+
+  .muted {
+    color: var(--muted);
+    font-size: 8.4pt;
+  }
+
+  .role {
+    margin-top: 0.8mm;
+  }
+
+  .title {
+    font-weight: 600;
+  }
+
+  .dates {
+    flex: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.8pt;
+    color: var(--muted);
+  }
+
+  ul {
+    margin-top: 0.5mm;
+    padding-left: 3.6mm;
+  }
+
+  li::marker {
+    color: var(--muted);
+  }
+
+  .skills {
+    display: grid;
+    gap: 0.8mm;
+  }
+
+  .skills > div {
+    display: grid;
+    grid-template-columns: 36mm 1fr;
+    gap: 3mm;
+  }
+
+  .skills dt {
+    font-weight: 600;
+  }
+</style>
+
+<style is:global>
+  .headline-row {
+    margin-top: 1.6mm;
+  }
+
+  .headline-row .headline {
+    margin-top: 0;
+  }
+
+  .location {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.8pt;
+    color: var(--muted);
+  }
+</style>

@@ -1,0 +1,200 @@
+---
+import { useTranslations, type Lang } from '@/i18n/ui';
+import { cv, formatYearMonth, jobYears } from '@/data/cv';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const present = t('cv.present');
+---
+
+<section class="block" aria-labelledby="experience-title">
+  <h2 id="experience-title">{t('about.experience')}</h2>
+  <ol class="jobs" role="list">
+    {
+      cv.experience.map((job) => (
+        <li class="job">
+          <p class="years mono">{jobYears(job, t('cv.presentShort'))}</p>
+          <div>
+            <h3 class="company">{job.company}</h3>
+            <p class="meta mono">
+              {job.sector[lang]} · {job.location[lang]}
+            </p>
+            <ul class="roles" role="list">
+              {job.roles.map((role) => (
+                <li>
+                  <p class="role">
+                    <span class="role-title">{role.title[lang]}</span>
+                    <span class="dates mono">
+                      {formatYearMonth(role.start, lang, present)} – {formatYearMonth(role.end, lang, present)}
+                    </span>
+                  </p>
+                  <ul class="highlights">
+                    {role.highlights[lang].map((h) => (
+                      <li>{h}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<section class="block" aria-labelledby="education-title">
+  <h2 id="education-title">{t('about.education')}</h2>
+  <ol class="jobs" role="list">
+    {
+      cv.education.map((ed) => (
+        <li class="job">
+          <p class="years mono">
+            {ed.start ? `${ed.start.slice(0, 4)} – ${ed.end.slice(0, 4)}` : ed.end.slice(0, 4)}
+          </p>
+          <div>
+            <h3 class="company">{ed.degree[lang]}</h3>
+            <p class="meta mono">
+              {ed.institution}
+              {ed.location && ` · ${ed.location[lang]}`}
+            </p>
+            {ed.detail && <p class="detail">{ed.detail[lang]}</p>}
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<section class="block" aria-labelledby="skills-title">
+  <h2 id="skills-title">{t('about.skills')}</h2>
+  <dl class="skills">
+    {
+      cv.skills.map((group) => (
+        <div>
+          <dt class="mono">{group.label[lang]}</dt>
+          <dd>{group.items[lang].join(' · ')}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>
+
+<style>
+  .block {
+    margin-top: var(--space-l);
+    padding-top: var(--space-s);
+    border-top: 1px solid var(--rule);
+    max-width: var(--measure);
+  }
+
+  h2 {
+    font-size: var(--step-2);
+  }
+
+  .jobs {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-m);
+  }
+
+  .job {
+    display: grid;
+    gap: var(--space-3xs) var(--space-m);
+    padding-block: var(--space-m);
+  }
+
+  .job + .job {
+    border-top: 1px dashed var(--rule);
+  }
+
+  @media (min-width: 700px) {
+    .job {
+      grid-template-columns: 7.5rem minmax(0, 1fr);
+    }
+  }
+
+  .years {
+    color: var(--muted);
+    padding-top: 0.3em;
+    white-space: nowrap;
+  }
+
+  .company {
+    font-size: var(--step-1);
+    font-variation-settings: 'opsz' 24;
+    line-height: var(--leading-snug);
+  }
+
+  .meta {
+    margin-top: var(--space-3xs);
+    color: var(--muted);
+  }
+
+  .roles {
+    list-style: none;
+    padding: 0;
+  }
+
+  .roles > li {
+    margin-top: var(--space-s);
+  }
+
+  .role {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 var(--space-s);
+  }
+
+  .role-title {
+    font-weight: 500;
+  }
+
+  .dates {
+    color: var(--muted);
+  }
+
+  .highlights {
+    margin-top: var(--space-2xs);
+    padding-left: 1.1em;
+    color: var(--muted);
+  }
+
+  .highlights li + li {
+    margin-top: var(--space-3xs);
+  }
+
+  .highlights li::marker {
+    color: var(--rule-strong);
+  }
+
+  .detail {
+    margin-top: var(--space-2xs);
+    color: var(--muted);
+  }
+
+  .skills {
+    display: grid;
+    gap: var(--space-s);
+    margin-top: var(--space-m);
+  }
+
+  @media (min-width: 700px) {
+    .skills > div {
+      display: grid;
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--space-m);
+    }
+  }
+
+  .skills dt {
+    color: var(--muted);
+    padding-top: 0.2em;
+  }
+</style>
